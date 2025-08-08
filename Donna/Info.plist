@@ -24,5 +24,15 @@
 	<true/>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Donna needs access to Apple Events to integrate with system apps like Messages, Notes, Mail, and Calendar.</string>
+    <key>NSContactsUsageDescription</key>
+    <string>Donna needs access to your Contacts to search and manage them.</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Donna needs access to your Calendar to manage events and appointments.</string>
+    <key>NSRemindersUsageDescription</key>
+    <string>Donna needs access to your Reminders to create and manage tasks.</string>
+    <key>NSAppleScriptEnabled</key>
+    <true/>
 </dict>
 </plist>

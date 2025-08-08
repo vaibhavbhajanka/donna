@@ -1,5 +1,5 @@
 import Foundation
-// import MCP  // Temporarily commented out
+import MCP
 
 @MainActor
 final class MCPManager: ObservableObject {
@@ -9,7 +9,7 @@ final class MCPManager: ObservableObject {
     @Published private(set) var availableResources: [MCPResource] = []
     @Published private(set) var isInitialized = false
     
-    private var clients: [UUID: Any] = [:]  // Client temporarily changed to Any
+    private var clients: [UUID: Client] = [:]
     private var serverRegistry: MCPServerRegistry
     private let transportFactory: MCPTransportFactory
     
@@ -55,34 +55,43 @@ final class MCPManager: ObservableObject {
     // MARK: - Connection Management
     
     func connectToAllEnabledServers() async {
-        for server in servers.filter(\.isEnabled) {
+        AppLogger.shared.info("MCPManager", "Starting connection to all enabled servers")
+        AppLogger.shared.info("MCPManager", "Total servers: \(servers.count)")
+        
+        let enabledServers = servers.filter(\.isEnabled)
+        AppLogger.shared.info("MCPManager", "Enabled servers: \(enabledServers.count)")
+        
+        for (index, server) in enabledServers.enumerated() {
+            AppLogger.shared.info("MCPManager", "Connecting to server \(index + 1)/\(enabledServers.count): \(server.name)")
             await connectToServer(server)
         }
+        
         isInitialized = true
+        AppLogger.shared.info("MCPManager", "Initialization complete. Connected servers: \(clients.count)/\(enabledServers.count)")
     }
     
     func connectToServer(_ server: MCPServer) async {
         updateServerStatus(server.id, status: .connecting)
         
-        // TODO: Implement actual connection once MCP SDK transport API is clarified
-        // For now, mark as disconnected to avoid crashes
-        updateServerStatus(server.id, status: .disconnected, error: "Transport implementation pending")
-        
-        /*
         do {
-            let client = Client(name: "Violet", version: "0.1.0")
+            AppLogger.shared.info("MCPManager", "Connecting to MCP server: \(server.name)")
+            AppLogger.shared.debug("MCPManager", "Server URL: \(server.url)")
+            
+            let client = Client(name: "Donna", version: "0.1.0")
             let transport = try transportFactory.createTransport(for: server)
             
+            AppLogger.shared.debug("MCPManager", "Attempting client connection…")
             try await client.connect(transport: transport)
             clients[server.id] = client
             
+            AppLogger.shared.info("MCPManager", "Connected successfully to \(server.name)")
             updateServerStatus(server.id, status: .connected)
             await discoverServerCapabilities(server)
             
         } catch {
+            AppLogger.shared.error("MCPManager", "Connection failed to \(server.name): \(error.localizedDescription)")
             updateServerStatus(server.id, status: .error, error: error.localizedDescription)
         }
-        */
     }
     
     func disconnectFromServer(_ server: MCPServer) {
@@ -93,14 +102,12 @@ final class MCPManager: ObservableObject {
     }
     
     private func discoverServerCapabilities(_ server: MCPServer) async {
-        // TODO: Implement capabilities discovery once MCP SDK API is clarified
-        /*
         guard let client = clients[server.id] else { return }
         
+        // Discover tools
         do {
-            // Discover tools
-            let toolsResponse = try await client.listTools()
-            let mcpTools = toolsResponse.tools.map { tool in
+            let (tools, _) = try await client.listTools()
+            let mcpTools = tools.map { tool in
                 MCPTool(
                     id: tool.name,
                     name: tool.name,
@@ -110,10 +117,15 @@ final class MCPManager: ObservableObject {
                 )
             }
             availableTools.append(contentsOf: mcpTools)
-            
-            // Discover resources
-            let resourcesResponse = try await client.listResources()
-            let mcpResources = resourcesResponse.resources.map { resource in
+            AppLogger.shared.info("MCPManager", "Discovered tools (\(mcpTools.count)): \(mcpTools.map{ $0.name }.joined(separator: ", "))")
+        } catch {
+            AppLogger.shared.warn("MCPManager", "listTools failed: \(error.localizedDescription)")
+        }
+
+        // Discover resources (best-effort; some servers may not implement)
+        do {
+            let (resources, _) = try await client.listResources()
+            let mcpResources = resources.map { resource in
                 MCPResource(
                     id: resource.uri,
                     uri: resource.uri,
@@ -124,50 +136,59 @@ final class MCPManager: ObservableObject {
                 )
             }
             availableResources.append(contentsOf: mcpResources)
-            
+            AppLogger.shared.info("MCPManager", "Discovered resources (\(mcpResources.count))")
         } catch {
-            print("Failed to discover capabilities for server \(server.name): \(error)")
+            AppLogger.shared.warn("MCPManager", "listResources failed (continuing): \(error.localizedDescription)")
         }
-        */
     }
     
     // MARK: - Tool Execution
     
     func callTool(_ tool: MCPTool, parameters: [String: Any]) async throws -> MCPToolResult {
-        // TODO: Implement tool calling once MCP SDK API is clarified
-        let callId = UUID()
-        return MCPToolResult(
-            callId: callId,
-            isSuccess: false,
-            error: "Tool calling implementation pending"
-        )
-        /*
         guard let client = clients[tool.serverId] else {
             throw MCPError.serverNotConnected
         }
         
         let callId = UUID()
-        let call = MCPToolCall(id: callId, toolId: tool.id, parameters: parameters)
         
         do {
-            let (content, isError) = try await client.callTool(name: tool.name, arguments: parameters)
+            // Convert [String: Any] to [String: Value] for MCP SDK
+            var arguments: [String: Value]? = nil
+            if !parameters.isEmpty {
+                arguments = Dictionary(uniqueKeysWithValues: parameters.compactMap { (key, value) in
+                    if let stringValue = value as? String {
+                        return (key, Value.string(stringValue))
+                    } else if let intValue = value as? Int {
+                        return (key, Value.int(intValue))
+                    } else if let doubleValue = value as? Double {
+                        return (key, Value.double(doubleValue))
+                    } else if let boolValue = value as? Bool {
+                        return (key, Value.bool(boolValue))
+                    }
+                    return nil
+                })
+            }
+            
+            let (content, isError) = try await client.callTool(name: tool.name, arguments: arguments)
             
             let contentString = content.compactMap { item in
                 switch item {
                 case .text(let text):
                     return text
-                case .image(_, _, let alt):
-                    return alt ?? "[Image]"
-                case .resource(let resource):
-                    return resource.text
+                case .image(let data, let mimeType, let metadata):
+                    return metadata?["alt"] ?? "[Image]"
+                case .audio(let data, let mimeType):
+                    return "[Audio: \(mimeType)]"
+                case .resource(let uri, let mimeType, let text):
+                    return text ?? "[Resource: \(uri)]"
                 }
             }.joined(separator: "\n")
             
             return MCPToolResult(
                 callId: callId,
-                isSuccess: !isError,
-                content: isError ? nil : contentString,
-                error: isError ? contentString : nil
+                isSuccess: !(isError ?? false),
+                content: (isError ?? false) ? nil : contentString,
+                error: (isError ?? false) ? contentString : nil
             )
             
         } catch {
@@ -177,59 +198,54 @@ final class MCPManager: ObservableObject {
                 error: error.localizedDescription
             )
         }
-        */
     }
     
     // MARK: - Resource Access
     
     func readResource(_ resource: MCPResource) async throws -> MCPResourceContent {
-        // TODO: Implement resource reading once MCP SDK API is clarified
-        return MCPResourceContent(
-            resourceId: resource.id,
-            content: "Resource reading implementation pending",
-            mimeType: resource.mimeType
-        )
-        /*
         guard let client = clients[resource.serverId] else {
             throw MCPError.serverNotConnected
         }
         
-        let resourceResponse = try await client.readResource(uri: resource.uri)
-        let content = resourceResponse.contents.compactMap { item in
-            switch item {
-            case .text(let text):
+        let contents = try await client.readResource(uri: resource.uri)
+        // Resource contents are returned as Resource.Content structs, not enums
+        let contentString = contents.compactMap { resourceContent in
+            if let text = resourceContent.text {
                 return text
-            case .resource(let resource):
-                return resource.text
-            default:
-                return nil
+            } else if let blob = resourceContent.blob {
+                return "[Binary data: \(blob.count) characters]"
+            } else {
+                return "[Resource: \(resourceContent.uri)]"
             }
         }.joined(separator: "\n")
         
         return MCPResourceContent(
             resourceId: resource.id,
-            content: content,
+            content: contentString,
             mimeType: resource.mimeType
         )
-        */
     }
     
     // MARK: - Persistence
     
     private func loadServers() {
-        if let data = UserDefaults.standard.data(forKey: "MCPServers"),
-           let decoded = try? JSONDecoder().decode([MCPServer].self, from: data) {
-            servers = decoded
-            for server in servers {
-                serverStatuses[server.id] = MCPServerStatus(serverId: server.id, status: .disconnected)
-            }
+        AppLogger.shared.info("MCPManager", "Loading servers from MCPServerRegistry")
+        let stored = serverRegistry.getStoredServers()
+        if stored.isEmpty {
+            AppLogger.shared.info("MCPManager", "No stored servers, loading defaults from registry")
+            servers = serverRegistry.getStoredServers()
+        } else {
+            servers = stored
+        }
+        AppLogger.shared.info("MCPManager", "Loaded \(servers.count) server(s)")
+        for (index, server) in servers.enumerated() {
+            AppLogger.shared.debug("MCPManager", "Server \(index + 1): \(server.name) (enabled: \(server.isEnabled))")
+            serverStatuses[server.id] = MCPServerStatus(serverId: server.id, status: .disconnected)
         }
     }
     
     private func saveServers() {
-        if let encoded = try? JSONEncoder().encode(servers) {
-            UserDefaults.standard.set(encoded, forKey: "MCPServers")
-        }
+        serverRegistry.storeServers(servers)
     }
 }
 

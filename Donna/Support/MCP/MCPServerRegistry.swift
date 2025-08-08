@@ -23,16 +23,10 @@ final class MCPServerRegistry {
     private func getDefaultServers() -> [MCPServer] {
         return [
             MCPServer(
-                name: "GitHub MCP Server",
-                url: URL(string: "http://localhost:3000")!,
-                description: "Access GitHub repositories, issues, and pull requests",
-                isEnabled: false
-            ),
-            MCPServer(
-                name: "File System MCP Server", 
-                url: URL(string: "http://localhost:3001")!,
-                description: "Read and write local files",
-                isEnabled: false
+                name: "Apple MCP Server",
+                url: URL(string: "stdio://bunx --no-cache apple-mcp@latest")!,
+                description: "Access Apple apps: Messages, Notes, Contacts, Mail, Reminders, Calendar, Maps",
+                isEnabled: true
             )
         ]
     }
@@ -98,12 +92,12 @@ final class MCPServerRegistry {
             errors.append("Server name is required")
         }
         
-        if server.url.scheme != "http" && server.url.scheme != "https" {
-            errors.append("Server URL must use http or https scheme")
+        if server.url.scheme != "http" && server.url.scheme != "https" && server.url.scheme != "stdio" {
+            errors.append("Server URL must use http, https, or stdio scheme")
         }
         
-        if server.url.host?.isEmpty != false {
-            errors.append("Server URL must include a valid host")
+        if server.url.scheme != "stdio" && server.url.host?.isEmpty != false {
+            errors.append("Server URL must include a valid host (except for stdio URLs)")
         }
         
         return errors

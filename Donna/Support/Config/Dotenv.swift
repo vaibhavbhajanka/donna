@@ -3,7 +3,7 @@ import Foundation
 /// Minimal .env loader for macOS apps.
 /// Search order:
 /// 1) ~/Library/Application Support/Donna/.env
-/// 2) ~/.violet.env
+/// 2) ~/.donna.env
 /// Values are cached after first read.
 enum Dotenv {
     private static var cached: [String: String]? = nil
@@ -24,7 +24,7 @@ enum Dotenv {
             locations.append(path)
         }
         let home = fileManager.homeDirectoryForCurrentUser
-        let homeDotfile = home.appendingPathComponent(".violet.env", isDirectory: false)
+        let homeDotfile = home.appendingPathComponent(".donna.env", isDirectory: false)
         locations.append(homeDotfile)
 
         for url in locations {
