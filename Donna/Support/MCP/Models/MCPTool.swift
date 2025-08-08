@@ -1,10 +1,11 @@
 import Foundation
+import MCP
 
 struct MCPTool: Identifiable, Codable, Equatable {
     let id: String
     let name: String
     let description: String?
-    let inputSchema: [String: Any]?
+    let inputSchema: Value?
     let serverId: UUID
     
     static func == (lhs: MCPTool, rhs: MCPTool) -> Bool {
@@ -18,7 +19,7 @@ struct MCPTool: Identifiable, Codable, Equatable {
         case id, name, description, serverId
     }
     
-    init(id: String, name: String, description: String? = nil, inputSchema: [String: Any]? = nil, serverId: UUID) {
+    init(id: String, name: String, description: String? = nil, inputSchema: Value? = nil, serverId: UUID) {
         self.id = id
         self.name = name
         self.description = description

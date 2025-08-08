@@ -11,14 +11,18 @@ settings:
     CODE_SIGNING_REQUIRED: NO
     CODE_SIGN_IDENTITY: "-"
     ENABLE_HARDENED_RUNTIME: NO
-packages: {}
+packages:
+  MCP:
+    url: https://github.com/modelcontextprotocol/swift-sdk
+    from: 0.9.0
 targets:
   Donna:
     type: application
     platform: macOS
     sources:
       - path: Donna
-    dependencies: []
+    dependencies:
+      - package: MCP
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.donna.app

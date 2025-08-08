@@ -3,6 +3,25 @@ import Foundation
 protocol LLMService {
     /// Returns an async stream of response chunks (tokens or small strings)
     func streamResponse(for prompt: String) -> AsyncStream<String>
+    /// Optional: Given a user prompt and available tool specs, propose a tool call with arguments.
+    /// Return nil to indicate no tool should be called.
+    func planToolCall(prompt: String, tools: [LLMToolSpec]) async -> PlannedToolCall?
+}
+
+// Describes a tool name and (optionally) a JSON Schema for its input arguments
+struct LLMToolSpec {
+    let name: String
+    let schemaJSON: String?
+}
+
+// Result of tool planning
+struct PlannedToolCall {
+    let toolName: String
+    let arguments: [String: Any]
+}
+
+extension LLMService {
+    func planToolCall(prompt: String, tools: [LLMToolSpec]) async -> PlannedToolCall? { nil }
 }
 
 /// A purely local echo/template LLM that streams out a templated response

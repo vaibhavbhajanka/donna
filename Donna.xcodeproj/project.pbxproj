@@ -7,35 +7,61 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		22958E487F8C2DD212EBAE95 /* MCPResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04597917802720B2D2A7C82E /* MCPResource.swift */; };
+		2A10BB3545188438FD8D5781 /* MCPTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BC9B635C9C918D70B8B1AAF /* MCPTool.swift */; };
+		3175196B8CA13BA150A2E9FE /* MCPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE775A4C4174DD50FC8B2180 /* MCPServer.swift */; };
 		46B57BB2BEAB4063F038D337 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE34D16990926444CBF785E1 /* LLMService.swift */; };
 		4B856649477A1EDBBB8F27D3 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2537EF7350E2BADB25B4C5D /* AppState.swift */; };
 		6732323D935D747A6B703AE5 /* AssistantResponseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4C1C2A189C9D1E750CFFB6 /* AssistantResponseView.swift */; };
 		8B657D09725176116C17A813 /* ActionLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4633AD46ACA2F1614339D8 /* ActionLogView.swift */; };
 		915C5C7C8A92585E66E72599 /* DonnaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC28DC63A351074F6219913 /* DonnaApp.swift */; };
 		9E62D197A0E33D71F354B1C4 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB028953BAD8B3E069FE335 /* ChatViewModel.swift */; };
+		AA5A23FBC4041C674F5CE425 /* MCPTransportFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3B118FC9EB54366E2700E5 /* MCPTransportFactory.swift */; };
 		ABB2B4AB9580CFA0B3CA10A1 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8D5AAC79FDB875AA628A38 /* AppCommands.swift */; };
 		AC6B5EA11A305D2C57E431E1 /* Dotenv.swift in Sources */ = {isa = PBXBuildFile; fileRef = D96475C895DDD2E79702BBFA /* Dotenv.swift */; };
 		BF7C7945B8D5F4DDA69A1878 /* OpenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0798EA1366F6F5CF9583B3CC /* OpenAIService.swift */; };
 		D54450590551F3A3701E2CE3 /* AssistantInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12692FA8A06E50440188D21 /* AssistantInputView.swift */; };
+		DBBB8EF4B449BC3F5B5E6841 /* MCPServerRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0A45CC20C20F0FCD6A04613 /* MCPServerRegistry.swift */; };
+		DBD1A17AAF95C3F5AE9B5017 /* MCPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E9FD63D505E89E8619D00DF /* MCPManager.swift */; };
 		F54826682ADD35F978E11467 /* AssistantFloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BFF61DEDE8B5F91DCFCAEE /* AssistantFloatingPanel.swift */; };
+		F6A1B2C33D4E5F67890ABCD1 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A1B2C23D4E5F67890ABCD0 /* AppLogger.swift */; };
+		FF03F23CB8F0DDFF3C8356BC /* MCP in Frameworks */ = {isa = PBXBuildFile; productRef = D1E613AAB590E3078F9743B6 /* MCP */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		04597917802720B2D2A7C82E /* MCPResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPResource.swift; sourceTree = "<group>"; };
 		0798EA1366F6F5CF9583B3CC /* OpenAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIService.swift; sourceTree = "<group>"; };
 		0C8D5AAC79FDB875AA628A38 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
+		0E9FD63D505E89E8619D00DF /* MCPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPManager.swift; sourceTree = "<group>"; };
+		1BC9B635C9C918D70B8B1AAF /* MCPTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPTool.swift; sourceTree = "<group>"; };
 		37BB9910016CD44E4EAB48D2 /* Donna.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Donna.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A4633AD46ACA2F1614339D8 /* ActionLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionLogView.swift; sourceTree = "<group>"; };
+		4E3B118FC9EB54366E2700E5 /* MCPTransportFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPTransportFactory.swift; sourceTree = "<group>"; };
 		56F4632D6755C10B357CF0E5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5FC28DC63A351074F6219913 /* DonnaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonnaApp.swift; sourceTree = "<group>"; };
 		6FB028953BAD8B3E069FE335 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
+		A0A45CC20C20F0FCD6A04613 /* MCPServerRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPServerRegistry.swift; sourceTree = "<group>"; };
 		A12692FA8A06E50440188D21 /* AssistantInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantInputView.swift; sourceTree = "<group>"; };
 		BE34D16990926444CBF785E1 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
 		C7BFF61DEDE8B5F91DCFCAEE /* AssistantFloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantFloatingPanel.swift; sourceTree = "<group>"; };
+		CE775A4C4174DD50FC8B2180 /* MCPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPServer.swift; sourceTree = "<group>"; };
 		CF5C8C3F5525DD440FF013EF /* .env */ = {isa = PBXFileReference; path = .env; sourceTree = "<group>"; };
 		D96475C895DDD2E79702BBFA /* Dotenv.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dotenv.swift; sourceTree = "<group>"; };
 		E2537EF7350E2BADB25B4C5D /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		FB4C1C2A189C9D1E750CFFB6 /* AssistantResponseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantResponseView.swift; sourceTree = "<group>"; };
+		F6A1B2C23D4E5F67890ABCD0 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7EAC77488BC24A8E7F0A3B63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF03F23CB8F0DDFF3C8356BC /* MCP in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		064CC51D231C235B77B7AF09 /* ViewModels */ = {
@@ -81,6 +107,8 @@
 				E2537EF7350E2BADB25B4C5D /* AppState.swift */,
 				564AC3415DC6B3846C35FECA /* Config */,
 				1B4040DEAAAC5A5860D7C452 /* LLM */,
+				CF3B0A5CE0C45589D830C835 /* MCP */,
+				F6A1B2C13D4E5F67890ABCCF /* Logging */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -122,6 +150,35 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		CF3B0A5CE0C45589D830C835 /* MCP */ = {
+			isa = PBXGroup;
+			children = (
+				0E9FD63D505E89E8619D00DF /* MCPManager.swift */,
+				A0A45CC20C20F0FCD6A04613 /* MCPServerRegistry.swift */,
+				4E3B118FC9EB54366E2700E5 /* MCPTransportFactory.swift */,
+				DB53EACAD1CF6E5332BECD7D /* Models */,
+			);
+			path = MCP;
+			sourceTree = "<group>";
+		};
+		DB53EACAD1CF6E5332BECD7D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				04597917802720B2D2A7C82E /* MCPResource.swift */,
+				CE775A4C4174DD50FC8B2180 /* MCPServer.swift */,
+				1BC9B635C9C918D70B8B1AAF /* MCPTool.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F6A1B2C13D4E5F67890ABCCF /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				F6A1B2C23D4E5F67890ABCD0 /* AppLogger.swift */,
+			);
+			path = Logging;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -130,6 +187,7 @@
 			buildConfigurationList = F5A90C853023196A91AE9CB6 /* Build configuration list for PBXNativeTarget "Donna" */;
 			buildPhases = (
 				95F6B6F2DFD7A0A2D8D10CB6 /* Sources */,
+				7EAC77488BC24A8E7F0A3B63 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -137,6 +195,7 @@
 			);
 			name = Donna;
 			packageProductDependencies = (
+				D1E613AAB590E3078F9743B6 /* MCP */,
 			);
 			productName = Donna;
 			productReference = 37BB9910016CD44E4EAB48D2 /* Donna.app */;
@@ -161,6 +220,9 @@
 			);
 			mainGroup = 8EAEC0A759AE7660B01272D0;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D8B734006EB56EE645EE8597 /* XCRemoteSwiftPackageReference "swift-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
@@ -185,7 +247,14 @@
 				915C5C7C8A92585E66E72599 /* DonnaApp.swift in Sources */,
 				AC6B5EA11A305D2C57E431E1 /* Dotenv.swift in Sources */,
 				46B57BB2BEAB4063F038D337 /* LLMService.swift in Sources */,
+				DBD1A17AAF95C3F5AE9B5017 /* MCPManager.swift in Sources */,
+				22958E487F8C2DD212EBAE95 /* MCPResource.swift in Sources */,
+				3175196B8CA13BA150A2E9FE /* MCPServer.swift in Sources */,
+				DBBB8EF4B449BC3F5B5E6841 /* MCPServerRegistry.swift in Sources */,
+				2A10BB3545188438FD8D5781 /* MCPTool.swift in Sources */,
+				AA5A23FBC4041C674F5CE425 /* MCPTransportFactory.swift in Sources */,
 				BF7C7945B8D5F4DDA69A1878 /* OpenAIService.swift in Sources */,
+				F6A1B2C33D4E5F67890ABCD1 /* AppLogger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,6 +444,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D8B734006EB56EE645EE8597 /* XCRemoteSwiftPackageReference "swift-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/modelcontextprotocol/swift-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D1E613AAB590E3078F9743B6 /* MCP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D8B734006EB56EE645EE8597 /* XCRemoteSwiftPackageReference "swift-sdk" */;
+			productName = MCP;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2F6D8170A45B0F45B2C3EC41 /* Project object */;
 }
