@@ -1,0 +1,36 @@
+name: Donna
+options:
+  bundleIdPrefix: com.donna
+  generateEmptyDirectories: true
+  deploymentTarget:
+    macOS: "13.0"
+settings:
+  base:
+    SWIFT_VERSION: 5.9
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGN_IDENTITY: "-"
+    ENABLE_HARDENED_RUNTIME: NO
+packages: {}
+targets:
+  Donna:
+    type: application
+    platform: macOS
+    sources:
+      - path: Donna
+    dependencies: []
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.donna.app
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+    info:
+      path: Donna/Info.plist
+      properties:
+        CFBundleName: Donna
+        CFBundleIdentifier: com.donna.app
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        LSMinimumSystemVersion: "13.0"
+        NSHighResolutionCapable: true
+        NSPrincipalClass: NSApplication

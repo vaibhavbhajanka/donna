@@ -1,0 +1,380 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		46B57BB2BEAB4063F038D337 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE34D16990926444CBF785E1 /* LLMService.swift */; };
+		4B856649477A1EDBBB8F27D3 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2537EF7350E2BADB25B4C5D /* AppState.swift */; };
+		6732323D935D747A6B703AE5 /* AssistantResponseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4C1C2A189C9D1E750CFFB6 /* AssistantResponseView.swift */; };
+		8B657D09725176116C17A813 /* ActionLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4633AD46ACA2F1614339D8 /* ActionLogView.swift */; };
+		915C5C7C8A92585E66E72599 /* DonnaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC28DC63A351074F6219913 /* DonnaApp.swift */; };
+		9E62D197A0E33D71F354B1C4 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB028953BAD8B3E069FE335 /* ChatViewModel.swift */; };
+		ABB2B4AB9580CFA0B3CA10A1 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8D5AAC79FDB875AA628A38 /* AppCommands.swift */; };
+		AC6B5EA11A305D2C57E431E1 /* Dotenv.swift in Sources */ = {isa = PBXBuildFile; fileRef = D96475C895DDD2E79702BBFA /* Dotenv.swift */; };
+		BF7C7945B8D5F4DDA69A1878 /* OpenAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0798EA1366F6F5CF9583B3CC /* OpenAIService.swift */; };
+		D54450590551F3A3701E2CE3 /* AssistantInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12692FA8A06E50440188D21 /* AssistantInputView.swift */; };
+		F54826682ADD35F978E11467 /* AssistantFloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7BFF61DEDE8B5F91DCFCAEE /* AssistantFloatingPanel.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0798EA1366F6F5CF9583B3CC /* OpenAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIService.swift; sourceTree = "<group>"; };
+		0C8D5AAC79FDB875AA628A38 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
+		37BB9910016CD44E4EAB48D2 /* Donna.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Donna.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A4633AD46ACA2F1614339D8 /* ActionLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionLogView.swift; sourceTree = "<group>"; };
+		56F4632D6755C10B357CF0E5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5FC28DC63A351074F6219913 /* DonnaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonnaApp.swift; sourceTree = "<group>"; };
+		6FB028953BAD8B3E069FE335 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
+		A12692FA8A06E50440188D21 /* AssistantInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantInputView.swift; sourceTree = "<group>"; };
+		BE34D16990926444CBF785E1 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
+		C7BFF61DEDE8B5F91DCFCAEE /* AssistantFloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantFloatingPanel.swift; sourceTree = "<group>"; };
+		CF5C8C3F5525DD440FF013EF /* .env */ = {isa = PBXFileReference; path = .env; sourceTree = "<group>"; };
+		D96475C895DDD2E79702BBFA /* Dotenv.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dotenv.swift; sourceTree = "<group>"; };
+		E2537EF7350E2BADB25B4C5D /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		FB4C1C2A189C9D1E750CFFB6 /* AssistantResponseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantResponseView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		064CC51D231C235B77B7AF09 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				6FB028953BAD8B3E069FE335 /* ChatViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		1B4040DEAAAC5A5860D7C452 /* LLM */ = {
+			isa = PBXGroup;
+			children = (
+				BE34D16990926444CBF785E1 /* LLMService.swift */,
+				0798EA1366F6F5CF9583B3CC /* OpenAIService.swift */,
+			);
+			path = LLM;
+			sourceTree = "<group>";
+		};
+		4437C9D6AC89F1A9A462564C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				3A4633AD46ACA2F1614339D8 /* ActionLogView.swift */,
+				C7BFF61DEDE8B5F91DCFCAEE /* AssistantFloatingPanel.swift */,
+				A12692FA8A06E50440188D21 /* AssistantInputView.swift */,
+				FB4C1C2A189C9D1E750CFFB6 /* AssistantResponseView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		564AC3415DC6B3846C35FECA /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				D96475C895DDD2E79702BBFA /* Dotenv.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		70975F0853CAA0E42CAAAB52 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				0C8D5AAC79FDB875AA628A38 /* AppCommands.swift */,
+				E2537EF7350E2BADB25B4C5D /* AppState.swift */,
+				564AC3415DC6B3846C35FECA /* Config */,
+				1B4040DEAAAC5A5860D7C452 /* LLM */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		8EAEC0A759AE7660B01272D0 = {
+			isa = PBXGroup;
+			children = (
+				C5C9D1594B9DE2E6B05E621F /* Donna */,
+				CEADFE3658997E1FF1C25620 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B71AFF277CE829CEF1E5CC5E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C5C9D1594B9DE2E6B05E621F /* Donna */ = {
+			isa = PBXGroup;
+			children = (
+				CF5C8C3F5525DD440FF013EF /* .env */,
+				5FC28DC63A351074F6219913 /* DonnaApp.swift */,
+				56F4632D6755C10B357CF0E5 /* Info.plist */,
+				B71AFF277CE829CEF1E5CC5E /* Resources */,
+				70975F0853CAA0E42CAAAB52 /* Support */,
+				064CC51D231C235B77B7AF09 /* ViewModels */,
+				4437C9D6AC89F1A9A462564C /* Views */,
+			);
+			path = Donna;
+			sourceTree = "<group>";
+		};
+		CEADFE3658997E1FF1C25620 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				37BB9910016CD44E4EAB48D2 /* Donna.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1603150D728CFA594FA81592 /* Donna */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5A90C853023196A91AE9CB6 /* Build configuration list for PBXNativeTarget "Donna" */;
+			buildPhases = (
+				95F6B6F2DFD7A0A2D8D10CB6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Donna;
+			packageProductDependencies = (
+			);
+			productName = Donna;
+			productReference = 37BB9910016CD44E4EAB48D2 /* Donna.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2F6D8170A45B0F45B2C3EC41 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 5EA94FE80192BE0B32DE28D2 /* Build configuration list for PBXProject "Donna" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 8EAEC0A759AE7660B01272D0;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1603150D728CFA594FA81592 /* Donna */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		95F6B6F2DFD7A0A2D8D10CB6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B657D09725176116C17A813 /* ActionLogView.swift in Sources */,
+				ABB2B4AB9580CFA0B3CA10A1 /* AppCommands.swift in Sources */,
+				4B856649477A1EDBBB8F27D3 /* AppState.swift in Sources */,
+				F54826682ADD35F978E11467 /* AssistantFloatingPanel.swift in Sources */,
+				D54450590551F3A3701E2CE3 /* AssistantInputView.swift in Sources */,
+				6732323D935D747A6B703AE5 /* AssistantResponseView.swift in Sources */,
+				9E62D197A0E33D71F354B1C4 /* ChatViewModel.swift in Sources */,
+				915C5C7C8A92585E66E72599 /* DonnaApp.swift in Sources */,
+				AC6B5EA11A305D2C57E431E1 /* Dotenv.swift in Sources */,
+				46B57BB2BEAB4063F038D337 /* LLMService.swift in Sources */,
+				BF7C7945B8D5F4DDA69A1878 /* OpenAIService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		225D0A2BEDB2543323097F59 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Donna/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.donna.app;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		5E7556758C9D53D67639BB83 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Donna/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.donna.app;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		7BB1E09C1F17922AF527B7C0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		85206078CDEBDEBA4B446A63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5EA94FE80192BE0B32DE28D2 /* Build configuration list for PBXProject "Donna" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85206078CDEBDEBA4B446A63 /* Debug */,
+				7BB1E09C1F17922AF527B7C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F5A90C853023196A91AE9CB6 /* Build configuration list for PBXNativeTarget "Donna" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E7556758C9D53D67639BB83 /* Debug */,
+				225D0A2BEDB2543323097F59 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2F6D8170A45B0F45B2C3EC41 /* Project object */;
+}
