@@ -40,10 +40,11 @@ final class ChatViewModel: ObservableObject {
     private var historyIndex: Int? = nil
 
     // LLM
-    private let llm: LLMService
+    private var llm: LLMService
     private var streamingTask: Task<Void, Never>? = nil
     private var cancellables: Set<AnyCancellable> = []
     private var lastLoggedToolCount: Int = 0
+    private let apiKey: String?
     
     // MCP Integration
     let mcpManager: MCPManager
@@ -51,16 +52,18 @@ final class ChatViewModel: ObservableObject {
     init() {
         let envKey = Dotenv.get("OPENAI_API_KEY")
         let procKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"]
-        let apiKey = (envKey?.isEmpty == false ? envKey : nil) ?? (procKey?.isEmpty == false ? procKey : nil)
-        if let apiKey = apiKey {
-            let system = "You are Donna, a macOS assistant. When applicable, suggest or request using available MCP tools (Apple MCP: notes, contacts, calendar, mail, reminders). Prefer precise, concise answers."
-            self.llm = OpenAIService(apiKey: apiKey, model: "gpt-4o-mini", systemPrompt: system)
+        self.apiKey = (envKey?.isEmpty == false ? envKey : nil) ?? (procKey?.isEmpty == false ? procKey : nil)
+        
+        // Initialize MCP Manager first
+        self.mcpManager = MCPManager()
+        
+        // Initialize LLM with basic prompt first, will be updated dynamically
+        if let apiKey = self.apiKey {
+            self.llm = OpenAIService(apiKey: apiKey, model: "gpt-4o-mini", systemPrompt: "You are Donna, a macOS assistant.")
         } else {
             self.llm = LocalEchoLLMService()
         }
         
-        // Initialize MCP Manager
-        self.mcpManager = MCPManager()
         AppLogger.shared.info("ChatVM", "initialized")
         
         // Servers are managed via MCPServerRegistry persistence; no sample servers
@@ -82,9 +85,25 @@ final class ChatViewModel: ObservableObject {
                     self.lastLoggedToolCount = tools.count
                     let names = tools.map { $0.name }.joined(separator: ", ")
                     self.actionLogs.append(ActionLogEntry(text: "MCP tools (\(tools.count)): \(names)"))
+                    
+                    // Update LLM system prompt when tools change
+                    self.refreshSystemPrompt()
                 }
             }
             .store(in: &cancellables)
+        
+        // Observe server status changes to refresh prompt when connections change
+        mcpManager.$serverStatuses
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                // Refresh system prompt when server connections change
+                self.refreshSystemPrompt()
+            }
+            .store(in: &cancellables)
+        
+        // Set initial system prompt after all properties are initialized
+        refreshSystemPrompt()
     }
 
     // MARK: - Intents
@@ -131,7 +150,7 @@ final class ChatViewModel: ObservableObject {
         }
         
         // Add MCP status to logs
-        let connectedServers = mcpManager.serverStatuses.values.filter { $0.status == .connected }.count
+        let connectedServers = mcpManager.serverStatuses.values.filter { $0.status == MCPConnectionStatus.connected }.count
         let totalServers = mcpManager.servers.count
         if totalServers > 0 {
             actionLogs.append(ActionLogEntry(text: "MCP servers: \(connectedServers)/\(totalServers) connected"))
@@ -150,6 +169,10 @@ final class ChatViewModel: ObservableObject {
         // If MCP tools available, attempt LLM-driven tool planning first; fall back to heuristics
         Task { @MainActor in
             var handled = false
+            
+            // First, enhance the prompt with relevant resource context
+            let enhancedPrompt = await self.enhancePromptWithContext(trimmed)
+            
             if !self.mcpManager.availableTools.isEmpty {
                 // Build tool specs for planner
                 let specs: [LLMToolSpec] = self.mcpManager.availableTools.map { t in
@@ -159,7 +182,7 @@ final class ChatViewModel: ObservableObject {
                     }
                     return LLMToolSpec(name: t.name, schemaJSON: schemaJSON)
                 }
-                if let plan = await self.llm.planToolCall(prompt: trimmed, tools: specs) {
+                if let plan = await self.llm.planToolCall(prompt: enhancedPrompt, tools: specs) {
                     if let tool = self.mcpManager.availableTools.first(where: { $0.name == plan.toolName }) {
                         self.actionLogs.append(ActionLogEntry(text: "Calling MCP tool (planned): \(tool.name)"))
                         do {
@@ -180,7 +203,7 @@ final class ChatViewModel: ObservableObject {
                 handled = await self.tryCallMCPToolIfApplicable(for: trimmed)
             }
             if !handled {
-                self.startAssistantStreamingResponse(for: trimmed)
+                self.startAssistantStreamingResponse(for: enhancedPrompt)
             }
         }
 
@@ -215,6 +238,152 @@ final class ChatViewModel: ObservableObject {
     // MARK: - Private
     
     private func addSampleMCPServers() { /* removed */ }
+    
+    // MARK: - Context Enhancement
+    
+    private func identifyRelevantResources(for prompt: String) -> [MCPResource] {
+        let keywords = prompt.lowercased()
+        return mcpManager.availableResources.filter { resource in
+            let resourceName = resource.name.lowercased()
+            let resourceUri = resource.uri.lowercased()
+            
+            // Match based on user intent and resource type
+            if keywords.contains("note") && (resourceName.contains("note") || resourceUri.contains("note")) {
+                return true
+            }
+            if keywords.contains("calendar") && (resourceName.contains("calendar") || resourceUri.contains("calendar")) {
+                return true
+            }
+            if keywords.contains("contact") && (resourceName.contains("contact") || resourceUri.contains("contact")) {
+                return true
+            }
+            if (keywords.contains("today") || keywords.contains("schedule")) && resourceUri.contains("today") {
+                return true
+            }
+            if keywords.contains("recent") && resourceName.contains("recent") {
+                return true
+            }
+            if keywords.contains("mail") || keywords.contains("email") {
+                return resourceName.contains("mail") || resourceUri.contains("mail")
+            }
+            if keywords.contains("reminder") && (resourceName.contains("reminder") || resourceUri.contains("reminder")) {
+                return true
+            }
+            
+            return false
+        }
+    }
+    
+    private func gatherResourceContext(for resources: [MCPResource]) async -> String {
+        var contextParts: [String] = []
+        
+        for resource in resources.prefix(5) { // Limit to 5 resources to avoid overwhelming the context
+            do {
+                let content = try await mcpManager.readResource(resource)
+                let truncatedContent = String(content.content.prefix(500)) // Limit content length
+                contextParts.append("[\(resource.name)]:\n\(truncatedContent)")
+                AppLogger.shared.debug("ChatVM", "Added resource context: \(resource.name)")
+            } catch {
+                AppLogger.shared.warn("ChatVM", "Failed to read resource \(resource.name): \(error.localizedDescription)")
+            }
+        }
+        
+        return contextParts.isEmpty ? "" : "\n\n## Relevant Context from your data:\n" + contextParts.joined(separator: "\n\n")
+    }
+    
+    private func enhancePromptWithContext(_ prompt: String) async -> String {
+        let relevantResources = identifyRelevantResources(for: prompt)
+        
+        if relevantResources.isEmpty {
+            return prompt
+        }
+        
+        actionLogs.append(ActionLogEntry(text: "Gathering context from \(relevantResources.count) relevant resources..."))
+        let contextualInfo = await gatherResourceContext(for: relevantResources)
+        
+        return prompt + contextualInfo
+    }
+    
+    private func findRelevantWorkflowPrompt(for prompt: String) async -> String? {
+        let availablePrompts = mcpManager.availablePrompts
+        guard !availablePrompts.isEmpty else { return nil }
+        
+        let keywords = prompt.lowercased()
+        
+        // Look for workflow-specific prompts
+        for prompt in availablePrompts {
+            let promptName = prompt.name.lowercased()
+            
+            if keywords.contains("plan") && (promptName.contains("daily") || promptName.contains("planning")) {
+                return prompt.name
+            }
+            if (keywords.contains("note") || keywords.contains("organize")) && promptName.contains("note") {
+                return prompt.name
+            }
+            if (keywords.contains("email") || keywords.contains("follow")) && promptName.contains("email") {
+                return prompt.name
+            }
+            if keywords.contains("meeting") && promptName.contains("meeting") {
+                return prompt.name
+            }
+            if (keywords.contains("contact") || keywords.contains("reach")) && promptName.contains("contact") {
+                return prompt.name
+            }
+        }
+        
+        return nil
+    }
+    
+    private func extractParametersWithContext(from prompt: String, for tool: MCPTool) -> [String: Any] {
+        var params: [String: Any] = [:]
+        let normalized = prompt.lowercased()
+        
+        // Enhanced parameter extraction based on tool name and user input
+        if tool.name.lowercased().contains("search") {
+            // Extract search query more intelligently
+            var query = prompt
+            let stopWords = ["search", "find", "look for", "show me", "get", "notes", "note", "contacts", "calendar", "mail", "reminders"]
+            for word in stopWords {
+                query = query.replacingOccurrences(of: word, with: "", options: .caseInsensitive)
+            }
+            query = query.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !query.isEmpty {
+                params["query"] = query
+                params["searchText"] = query  // Alternative parameter name
+            }
+        }
+        
+        // Extract date/time parameters
+        if normalized.contains("today") {
+            params["date"] = "today"
+            params["timeframe"] = "today"
+        } else if normalized.contains("tomorrow") {
+            params["date"] = "tomorrow"
+        } else if normalized.contains("this week") {
+            params["timeframe"] = "week"
+        }
+        
+        // Extract limit parameters
+        let numberPattern = try? NSRegularExpression(pattern: "\\d+")
+        if let regex = numberPattern, 
+           let match = regex.firstMatch(in: normalized, options: [], range: NSRange(location: 0, length: normalized.count)) {
+            let matchRange = Range(match.range, in: normalized)
+            if let matchRange = matchRange {
+                let number = Int(String(normalized[matchRange])) ?? 10
+                params["limit"] = number
+                params["count"] = number
+            }
+        }
+        
+        // Extract folder/category parameters
+        if let folderName = extractFolderName(from: prompt) {
+            params["folder"] = folderName
+            params["folderName"] = folderName
+            params["category"] = folderName
+        }
+        
+        return params
+    }
 
     private func buildPlanLine(from prompt: String) -> String {
         // Simple echo plan for UI demo only
@@ -248,12 +417,24 @@ final class ChatViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Simple MCP tool router (heuristic)
+    // MARK: - Enhanced MCP tool router with prompt support
     private func tryCallMCPToolIfApplicable(for prompt: String) async -> Bool {
 
         let normalized = prompt.lowercased()
         let tools = mcpManager.availableTools
         guard !tools.isEmpty else { return false }
+        
+        // First, try to find and use a relevant MCP prompt for better parameter extraction
+        if let workflowPrompt = await findRelevantWorkflowPrompt(for: prompt) {
+            actionLogs.append(ActionLogEntry(text: "Using MCP workflow prompt: \(workflowPrompt)"))
+            do {
+                let promptContent = try await mcpManager.getPrompt(name: workflowPrompt, arguments: ["user_request": prompt])
+                // Use the workflow prompt to guide tool selection and parameter extraction
+                AppLogger.shared.info("ChatVM", "Applied workflow prompt: \(workflowPrompt)")
+            } catch {
+                AppLogger.shared.warn("ChatVM", "Failed to apply workflow prompt \(workflowPrompt): \(error.localizedDescription)")
+            }
+        }
 
         // Build fuzzy candidates by keyword
         var desiredNames: [String] = []
@@ -289,17 +470,11 @@ final class ChatViewModel: ObservableObject {
 
         actionLogs.append(ActionLogEntry(text: "Calling MCP tool: \(selected!.name)"))
 
-        // Minimal query extraction for *search* tools
-        var params: [String: Any] = [:]
-        if selected!.name.lowercased().contains("search") {
-            let stripped = normalized
-                .replacingOccurrences(of: "search", with: "")
-                .replacingOccurrences(of: "notes", with: "")
-                .replacingOccurrences(of: "note", with: "")
-                .replacingOccurrences(of: "for", with: "")
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            if !stripped.isEmpty { params["query"] = stripped }
-        } else if selected!.name.lowercased() == "notes" {
+        // Use enhanced parameter extraction
+        var params = extractParametersWithContext(from: prompt, for: selected!)
+        
+        // Legacy support for generic "notes" tool
+        if selected!.name.lowercased() == "notes" {
             // Heuristic: if the tool is a generic notes tool, try common action keys
             if containsAny(normalized, ["list","show","all","display","see"]) {
                 if let resultText = await callWithFallbackActionKeys(tool: selected!, action: "list") {
@@ -517,5 +692,78 @@ final class ChatViewModel: ObservableObject {
             }
         }
         return folder.isEmpty ? nil : folder
+    }
+    
+    // MARK: - Dynamic System Prompt
+    
+    private func refreshSystemPrompt() {
+        guard let apiKey = self.apiKey else { return }
+        
+        let newSystemPrompt = buildDynamicSystemPrompt()
+        self.llm = OpenAIService(apiKey: apiKey, model: "gpt-4o-mini", systemPrompt: newSystemPrompt)
+        
+        AppLogger.shared.debug("ChatVM", "System prompt refreshed with \(mcpManager.availableTools.count) tools from \(mcpManager.serverStatuses.values.filter { $0.status == .connected }.count) connected servers")
+    }
+    
+    private func buildDynamicSystemPrompt() -> String {
+        let availableTools = mcpManager.availableTools
+        let connectedServers = mcpManager.serverStatuses.values.filter { $0.status == MCPConnectionStatus.connected }.count
+        let totalServers = mcpManager.servers.count
+        
+        // Build tool descriptions dynamically
+        let toolDescriptions: String
+        if availableTools.isEmpty {
+            if totalServers == 0 {
+                toolDescriptions = "No MCP servers are configured."
+            } else if connectedServers == 0 {
+                toolDescriptions = "No MCP servers are currently connected. Tools will become available when servers connect successfully."
+            } else {
+                toolDescriptions = "MCP servers are connected but no tools have been discovered yet."
+            }
+        } else {
+            let toolList = availableTools.map { tool in
+                let description = tool.description?.isEmpty == false ? tool.description! : "MCP tool"
+                return "- **\(tool.name)**: \(description)"
+            }.joined(separator: "\n")
+            
+            toolDescriptions = """
+You have access to \(availableTools.count) MCP tool(s) from \(connectedServers) connected server(s):
+
+\(toolList)
+"""
+        }
+        
+        return """
+You are Donna, an intelligent macOS assistant with access to MCP (Model Context Protocol) tools for productivity and data management.
+
+## Current Tool Availability
+\(toolDescriptions)
+
+## Tool Selection Strategy
+- **Direct tool use**: When users ask about their personal data or capabilities you have tools for
+- **Resource-enhanced responses**: Use MCP resources to provide context-aware answers when available
+- **Graceful fallback**: If no suitable tools are available, provide helpful general guidance
+- **Multi-step workflows**: Chain related operations when beneficial and tools support it
+
+## Response Style  
+- **Precise and actionable**: Focus on what the user needs to know
+- **Context-aware**: Use actual user data when available to personalize responses
+- **macOS native**: Understand Apple ecosystem conventions and workflows
+- **Adaptive**: Adjust capabilities based on available tools and connections
+
+## Error Handling
+- For permission errors: Explain how to grant access in System Preferences
+- For connection failures: Suggest checking MCP server status or restarting
+- For unavailable tools: Clearly explain what tools are missing and offer alternatives
+- For invalid parameters: Ask for clarification with specific examples based on available tools
+
+## Follow-up Patterns
+After tool execution, proactively suggest related actions based on your available capabilities:
+- Offer to use other available tools that complement the completed action
+- Suggest workflows that utilize multiple available tools
+- Recommend data organization or management using your current toolset
+
+Always be transparent about your current capabilities and adapt your assistance based on the tools actually available to you.
+"""
     }
 }

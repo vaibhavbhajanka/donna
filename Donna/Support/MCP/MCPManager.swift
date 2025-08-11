@@ -1,12 +1,29 @@
 import Foundation
 import MCP
 
+struct MCPPrompt: Identifiable, Codable, Equatable {
+    let id: String
+    let name: String
+    let description: String?
+    let arguments: [String]?
+    let serverId: UUID
+    
+    init(id: String, name: String, description: String? = nil, arguments: [String]? = nil, serverId: UUID) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.arguments = arguments
+        self.serverId = serverId
+    }
+}
+
 @MainActor
 final class MCPManager: ObservableObject {
     @Published private(set) var servers: [MCPServer] = []
     @Published private(set) var serverStatuses: [UUID: MCPServerStatus] = [:]
     @Published private(set) var availableTools: [MCPTool] = []
     @Published private(set) var availableResources: [MCPResource] = []
+    @Published private(set) var availablePrompts: [MCPPrompt] = []
     @Published private(set) var isInitialized = false
     
     private var clients: [UUID: Client] = [:]
@@ -39,6 +56,7 @@ final class MCPManager: ObservableObject {
         clients.removeValue(forKey: server.id)
         availableTools.removeAll { $0.serverId == server.id }
         availableResources.removeAll { $0.serverId == server.id }
+        availablePrompts.removeAll { $0.serverId == server.id }
         saveServers()
     }
     
@@ -99,6 +117,7 @@ final class MCPManager: ObservableObject {
         updateServerStatus(server.id, status: .disconnected)
         availableTools.removeAll { $0.serverId == server.id }
         availableResources.removeAll { $0.serverId == server.id }
+        availablePrompts.removeAll { $0.serverId == server.id }
     }
     
     private func discoverServerCapabilities(_ server: MCPServer) async {
@@ -122,14 +141,14 @@ final class MCPManager: ObservableObject {
             AppLogger.shared.warn("MCPManager", "listTools failed: \(error.localizedDescription)")
         }
 
-        // Discover resources (best-effort; some servers may not implement)
+        // Discover resources (optional; gracefully handle if not supported)
         do {
             let (resources, _) = try await client.listResources()
             let mcpResources = resources.map { resource in
                 MCPResource(
                     id: resource.uri,
                     uri: resource.uri,
-                    name: resource.name ?? resource.uri,
+                    name: resource.name,
                     description: resource.description,
                     mimeType: resource.mimeType,
                     serverId: server.id
@@ -138,7 +157,35 @@ final class MCPManager: ObservableObject {
             availableResources.append(contentsOf: mcpResources)
             AppLogger.shared.info("MCPManager", "Discovered resources (\(mcpResources.count))")
         } catch {
-            AppLogger.shared.warn("MCPManager", "listResources failed (continuing): \(error.localizedDescription)")
+            let errorMsg = error.localizedDescription.lowercased()
+            if errorMsg.contains("method not found") || errorMsg.contains("not implemented") {
+                AppLogger.shared.debug("MCPManager", "Server '\(server.name)' does not support resources (optional MCP feature)")
+            } else {
+                AppLogger.shared.warn("MCPManager", "listResources failed: \(error.localizedDescription)")
+            }
+        }
+        
+        // Discover prompts (optional; gracefully handle if not supported)
+        do {
+            let (prompts, _) = try await client.listPrompts()
+            let mcpPrompts = prompts.map { prompt in
+                MCPPrompt(
+                    id: prompt.name,
+                    name: prompt.name,
+                    description: prompt.description,
+                    arguments: prompt.arguments?.map { $0.name },
+                    serverId: server.id
+                )
+            }
+            availablePrompts.append(contentsOf: mcpPrompts)
+            AppLogger.shared.info("MCPManager", "Discovered prompts (\(mcpPrompts.count)): \(mcpPrompts.map{ $0.name }.joined(separator: ", "))")
+        } catch {
+            let errorMsg = error.localizedDescription.lowercased()
+            if errorMsg.contains("method not found") || errorMsg.contains("not implemented") {
+                AppLogger.shared.debug("MCPManager", "Server '\(server.name)' does not support prompts (optional MCP feature)")
+            } else {
+                AppLogger.shared.warn("MCPManager", "listPrompts failed: \(error.localizedDescription)")
+            }
         }
     }
     
@@ -175,11 +222,11 @@ final class MCPManager: ObservableObject {
                 switch item {
                 case .text(let text):
                     return text
-                case .image(let data, let mimeType, let metadata):
-                    return metadata?["alt"] ?? "[Image]"
-                case .audio(let data, let mimeType):
+                case .image(_, let mimeType, let metadata):
+                    return metadata?["alt"] ?? "[Image: \(mimeType)]"
+                case .audio(_, let mimeType):
                     return "[Audio: \(mimeType)]"
-                case .resource(let uri, let mimeType, let text):
+                case .resource(let uri, _, let text):
                     return text ?? "[Resource: \(uri)]"
                 }
             }.joined(separator: "\n")
@@ -226,6 +273,50 @@ final class MCPManager: ObservableObject {
         )
     }
     
+    // MARK: - Prompt Access
+    
+    func getPrompt(name: String, arguments: [String: Any] = [:]) async throws -> String {
+        // Find the prompt and its associated server
+        guard let prompt = availablePrompts.first(where: { $0.name == name }),
+              let client = clients[prompt.serverId] else {
+            throw MCPError.promptNotFound
+        }
+        
+        // Convert arguments to MCP Value format
+        var mcpArguments: [String: Value]? = nil
+        if !arguments.isEmpty {
+            mcpArguments = Dictionary(uniqueKeysWithValues: arguments.compactMap { (key, value) in
+                if let stringValue = value as? String {
+                    return (key, Value.string(stringValue))
+                } else if let intValue = value as? Int {
+                    return (key, Value.int(intValue))
+                } else if let doubleValue = value as? Double {
+                    return (key, Value.double(doubleValue))
+                } else if let boolValue = value as? Bool {
+                    return (key, Value.bool(boolValue))
+                }
+                return nil
+            })
+        }
+        
+        let (description, messages) = try await client.getPrompt(name: name, arguments: mcpArguments)
+        
+        // Combine description and messages into a single string
+        var content = ""
+        if let desc = description, !desc.isEmpty {
+            content += "\(desc)\n\n"
+        }
+        
+        let messageContent = messages.compactMap { message in
+            // For now, just extract the raw content as string representation
+            // The actual MCP SDK structure might be different from tool calling content
+            return "\(message.content)"
+        }.joined(separator: "\n\n")
+        
+        content += messageContent
+        return content
+    }
+    
     // MARK: - Persistence
     
     private func loadServers() {
@@ -252,6 +343,7 @@ final class MCPManager: ObservableObject {
 enum MCPError: LocalizedError {
     case serverNotConnected
     case toolNotFound
+    case promptNotFound
     case invalidParameters
     
     var errorDescription: String? {
@@ -260,8 +352,10 @@ enum MCPError: LocalizedError {
             return "MCP server is not connected"
         case .toolNotFound:
             return "Tool not found"
+        case .promptNotFound:
+            return "Prompt not found"
         case .invalidParameters:
-            return "Invalid tool parameters"
+            return "Invalid parameters"
         }
     }
 }
