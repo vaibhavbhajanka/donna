@@ -96,18 +96,43 @@ final class MCPTransportFactory {
         
         // For bunx, we need to use the full path and set up proper environment
         if command == "bunx" {
-            AppLogger.shared.debug("Transport", "Using bunx with full path")
-            process.executableURL = URL(fileURLWithPath: "/opt/homebrew/bin/bunx")
-            process.arguments = arguments
+            AppLogger.shared.debug("Transport", "Using bunx with dynamic path detection")
+            // Try to find bunx in common locations
+            let bunxPaths = [
+                "/opt/homebrew/bin/bunx",  // Homebrew on Apple Silicon
+                "/usr/local/bin/bunx",     // Homebrew on Intel
+                "/home/ubuntu/.bun/bin/bunx", // Bun direct install (Linux)
+                "~/.bun/bin/bunx"          // Bun direct install (macOS)
+            ]
+            
+            var bunxPath: String?
+            for path in bunxPaths {
+                let expandedPath = NSString(string: path).expandingTildeInPath
+                if FileManager.default.fileExists(atPath: expandedPath) {
+                    bunxPath = expandedPath
+                    break
+                }
+            }
+            
+            if let bunxPath = bunxPath {
+                AppLogger.shared.debug("Transport", "Found bunx at: \(bunxPath)")
+                process.executableURL = URL(fileURLWithPath: bunxPath)
+                process.arguments = arguments
+            } else {
+                AppLogger.shared.debug("Transport", "bunx not found in common paths, falling back to env")
+                process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+                process.arguments = [command] + arguments
+            }
         } else {
             AppLogger.shared.debug("Transport", "Using env to find command: \(command)")
             process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
             process.arguments = [command] + arguments
         }
         
-        // Set up environment variables
+        // Set up environment variables with expanded PATH
         var env = ProcessInfo.processInfo.environment
-        env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+        let bunPath = NSString(string: "~/.bun/bin").expandingTildeInPath
+        env["PATH"] = "\(bunPath):/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
         process.environment = env
         AppLogger.shared.debug("Transport", "Process executable: \(process.executableURL?.path ?? "nil")")
         AppLogger.shared.debug("Transport", "Process arguments: \(process.arguments ?? [])")
